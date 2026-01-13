@@ -129,8 +129,7 @@
   </sensor>
 
   <worldbody>
-    <geom name="floor" type="plane" pos="0 0 -0.75" size="10 10 0.05" rgba="0.8 0.9 0.8 1" contype="2" conaffinity="1" friction="1 0.5 0.5"/>
-    <body name="torso">
+      <body name="torso">
       <inertial pos="-0.000971341 -7.63301e-05 0.0898493" quat="0.998034 0.00199235 0.0599357 0.0182343" mass="1.83264" diaginertia="0.0156368 0.0131516 0.00578565"/>
       <joint name="torso_free_joint" type="free"/>
       <site name='imu' size='0.01' pos='0 0 0'/>
