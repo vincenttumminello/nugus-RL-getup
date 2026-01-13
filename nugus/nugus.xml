@@ -13,6 +13,7 @@
     <mesh name="left_lower_leg_visual" file="left_lower_leg_visual.stl"/>
     <mesh name="left_ankle_visual" file="left_ankle_visual.stl"/>
     <mesh name="left_foot_visual" file="left_foot_visual.stl"/>
+    <mesh name="left_foot_base_visual" file="left_foot_base_visual.stl"/>
     <mesh name="right_hip_yaw_visual" file="right_hip_yaw_visual.stl"/>
     <mesh name="right_hip_roll_visual" file="right_hip_roll_visual.stl"/>
     <mesh name="right_upper_leg_visual" file="right_upper_leg_visual.stl"/>
@@ -34,7 +35,7 @@
   <default>
     <joint damping="1.084" armature="0.045" frictionloss="0.03"/>
     <position kp="40.1" ctrlrange="-3.141592 3.141592" forcerange="-100 100"/>
-    <geom contype="0" conaffinity="0" condim="1" solref="0.005 1"/>
+    <geom contype="1" conaffinity="2" condim="3" solref="0.005 1"/>
     <site group="5" type="sphere"/>
     <default class="collision">
       <geom group="3"/>
@@ -128,6 +129,7 @@
   </sensor>
 
   <worldbody>
+    <geom name="floor" type="plane" pos="0 0 -0.75" size="10 10 0.05" rgba="0.8 0.9 0.8 1" contype="2" conaffinity="1" friction="1 0.5 0.5"/>
     <body name="torso">
       <inertial pos="-0.000971341 -7.63301e-05 0.0898493" quat="0.998034 0.00199235 0.0599357 0.0182343" mass="1.83264" diaginertia="0.0156368 0.0131516 0.00578565"/>
       <joint name="torso_free_joint" type="free"/>
@@ -163,7 +165,9 @@
                 <body name="left_foot" pos="0 0 0" quat="0.707105 0.707108 0 0">
                   <inertial pos="0.0248226 0.00798542 0.033284" quat="0.99979 -0.0089131 -9.26048e-05 -0.0184639" mass="0.245581" diaginertia="0.00134758 0.00108371 0.00033179"/>
                   <joint name="left_ankle_roll" pos="0 0 0" axis="0 0 1" limited="true" range="-3.14159 3.14159"/>
-                  <geom type="mesh" contype="0" conaffinity="0" group="1" density="0" rgba="0.286275 0.286275 0.286275 1" mesh="left_foot_visual"/>\
+                  <geom type="mesh" contype="0" conaffinity="0" group="1" density="0" rgba="0.286275 0.286275 0.286275 1" mesh="left_foot_visual"/>
+                  <geom size="0.0284933 0.0657897 0.107911" pos="0.00950672 0.0109447 0.0211599" type="box" rgba="0.286275 0.286275 0.286275 0"/>
+                  <geom pos="0.038 0 0" quat="0.707105 0 -0.707108 0" type="mesh" contype="0" conaffinity="0" group="1" density="0" rgba="0.615686 0.811765 0.929412 1" mesh="left_foot_base_visual"/>
                   <geom name="l_foot1" class="foot" pos="0.02 0.01 0.02" size="0.02 0.06 0.105"/>
                   <site name="left_foot" rgba="1 0 0 1" pos="0.02 0 0"/>
                 </body>
