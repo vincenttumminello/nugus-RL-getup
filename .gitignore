@@ -1,0 +1,7 @@
+.venv/*
+
+getup_robot.zip
+
+__pycache__/
+
+logs/
