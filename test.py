@@ -5,7 +5,7 @@ from stable_baselines3 import PPO
 model = PPO.load("getup_robot")
 
 # Test with visualization
-env = GetUpEnv("nugus/nugus.xml")
+env = GetUpEnv("nugus/scene.xml")
 obs, _ = env.reset()
 
 import mujoco.viewer

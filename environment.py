@@ -33,8 +33,23 @@ class GetUpEnv(gym.Env):
         # Reset to initial lying down pose
         mujoco.mj_resetData(self.model, self.data)
         
-        # Optional: randomize initial position slightly
-        self.data.qpos[:] += np.random.uniform(-0.1, 0.1, self.model.nq)
+        # Set lying face down position
+        self.data.qpos[0] = 0.0  # x position
+        self.data.qpos[1] = 0.0  # y position
+        self.data.qpos[2] = 0.15  # z position (slightly above ground)
+        
+        # Set orientation face down (90° pitch forward)
+        self.data.qpos[3] = 0.7071  # qw
+        self.data.qpos[4] = 0.0     # qx
+        self.data.qpos[5] = 0.7071  # qy
+        self.data.qpos[6] = 0.0     # qz
+        
+        # Optional: randomize joint positions slightly (but not the torso pose)
+        if options and options.get('randomize', False):
+            self.data.qpos[7:] += np.random.uniform(-0.1, 0.1, self.model.nq - 7)
+        
+        # Zero all velocities
+        self.data.qvel[:] = 0
         
         self.current_step = 0
         mujoco.mj_forward(self.model, self.data)

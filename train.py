@@ -3,7 +3,7 @@ from stable_baselines3.common.env_checker import check_env
 from environment import GetUpEnv
 
 # Create environment
-env = GetUpEnv("nugus/nugus.xml")
+env = GetUpEnv("nugus/scene.xml")
 
 # Verify environment is correct
 check_env(env)
@@ -24,7 +24,8 @@ model = PPO(
 )
 
 # Train the agent
-model.learn(total_timesteps=1_000)
+model.learn(total_timesteps=1_000_000)
 
 # Save the trained model
 model.save("getup_robot")
+

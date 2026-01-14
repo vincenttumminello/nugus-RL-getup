@@ -148,17 +148,17 @@
           <geom size="0.0362265 0.02765 0.046925" pos="0.0211382 0.00135 -0.026825" type="box" rgba="0.286275 0.286275 0.286275 0"/>
           <body name="left_upper_leg" pos="0 0 0" quat="0.707105 -0.707108 0 0">
             <inertial pos="0.144296 0.0401097 0.000258488" quat="0.48018 0.474915 0.52246 0.520498" mass="0.313357" diaginertia="0.00167304 0.00160068 0.000213115"/>
-            <joint name="left_hip_pitch" pos="0 0 0" axis="0 0 1" limited="true" range="-3.14159 3.14159"/>
+            <joint name="left_hip_pitch" ref="0" pos="0 0 0" axis="0 0 1" limited="true" range="-3.14159 3.14159"/>
             <geom type="mesh" contype="0" conaffinity="0" group="1" density="0" rgba="0.286275 0.286275 0.286275 1" mesh="left_upper_leg_visual"/>
             <geom size="0.123135 0.0467353 0.0365" pos="0.103064 0.0303674 0" type="box" rgba="0.286275 0.286275 0.286275 0"/>
             <body name="left_lower_leg" pos="0.206046 0.0569501 0" quat="1 0 0 0">
               <inertial pos="0.1001 0.00388186 -1.61259e-08" quat="0.500001 0.500001 0.499999 0.499999" mass="0.0893011" diaginertia="0.000408951 0.0003363 9.01254e-05"/>
-              <joint name="left_knee_pitch" pos="0 0 0" axis="0 0 1" limited="true" range="-3.14159 3.14159" class="XH540-W270"/>
+              <joint name="left_knee_pitch" ref="0" pos="0 0 0" axis="0 0 1" limited="true" range="-3.14159 3.14159" class="XH540-W270"/>
               <geom type="mesh" contype="0" conaffinity="0" group="1" density="0" rgba="0.286275 0.286275 0.286275 1" mesh="left_lower_leg_visual"/>
               <geom size="0.114601 0.0155 0.039" pos="0.100101 0.001 0" type="box" rgba="0.286275 0.286275 0.286275 0"/>
               <body name="left_ankle" pos="0.200203 0 0" quat="1 0 0 0">
                 <inertial pos="-0.015733 0.0219762 0.000512596" quat="0.508721 0.491668 -0.491137 0.508184" mass="0.329993" diaginertia="0.000265803 0.000265762 0.000157721"/>
-                <joint name="left_ankle_pitch" pos="0 0 0" axis="0 0 1" limited="true" range="-3.14159 3.14159"/>
+                <joint name="left_ankle_pitch" ref="-0.6" pos="0 0 0" axis="0 0 1" limited="true" range="-3.14159 3.14159"/>
                 <geom type="mesh" contype="0" conaffinity="0" group="1" density="0" rgba="0.286275 0.286275 0.286275 1" mesh="left_ankle_visual"/>
                 <geom size="0.0331382 0.047194 0.02765" pos="-0.01805 0.027094 -0.00166756" type="box" rgba="0.286275 0.286275 0.286275 0"/>
                 <body name="left_foot" pos="0 0 0" quat="0.707105 0.707108 0 0">
@@ -187,17 +187,17 @@
           <geom size="0.0331382 0.02765 0.04705" pos="0.01805 -0.00315 -0.02695" type="box" rgba="0.286275 0.286275 0.286275 0"/>
           <body name="right_upper_leg" pos="0 0 0" quat="0.707105 -0.707108 0 0">
             <inertial pos="0.144343 0.0400917 -0.000278506" quat="0.47021 0.473824 0.526501 0.526488" mass="0.313809" diaginertia="0.00167983 0.00160132 0.000207139"/>
-            <joint name="right_hip_pitch" pos="0 0 0" axis="0 0 1" limited="true" range="-3.14159 3.14159"/>
+            <joint name="right_hip_pitch" ref="0" pos="0 0 0" axis="0 0 1" limited="true" range="-3.14159 3.14159"/>
             <geom type="mesh" contype="0" conaffinity="0" group="1" density="0" rgba="0.286275 0.286275 0.286275 1" mesh="right_upper_leg_visual"/>
             <geom size="0.123135 0.0467353 0.0365" pos="0.103064 0.0303674 -1.86265e-09" type="box" rgba="0.286275 0.286275 0.286275 0"/>
             <body name="right_lower_leg" pos="0.206046 0.0569501 0" quat="1 0 0 0">
               <inertial pos="0.100103 0.00388186 1.61259e-08" quat="0.499999 0.499999 0.500001 0.500001" mass="0.0893011" diaginertia="0.000408951 0.0003363 9.01254e-05"/>
-              <joint name="right_knee_pitch" pos="0 0 0" axis="0 0 1" limited="true" range="-3.14159 3.14159" class="XH540-W270"/>
+              <joint name="right_knee_pitch" ref="0" pos="0 0 0" axis="0 0 1" limited="true" range="-3.14159 3.14159" class="XH540-W270"/>
               <geom type="mesh" contype="0" conaffinity="0" group="1" density="0" rgba="0.286275 0.286275 0.286275 1" mesh="right_lower_leg_visual"/>
               <geom size="0.114601 0.0155 0.039" pos="0.100101 0.001 0" type="box" rgba="0.286275 0.286275 0.286275 0"/>
               <body name="right_ankle" pos="0.200203 0 0" quat="1 0 0 0">
                 <inertial pos="-0.015733 0.0218226 0.000508968" quat="0.51022 0.492773 -0.489643 0.507051" mass="0.329993" diaginertia="0.00026369 0.000263648 0.000157719"/>
-                <joint name="right_ankle_pitch" pos="0 0 0" axis="0 0 1" limited="false"/>
+                <joint name="right_ankle_pitch" ref="-0.6" pos="0 0 0" axis="0 0 1" limited="false"/>
                 <geom type="mesh" contype="0" conaffinity="0" group="1" density="0" rgba="0.286275 0.286275 0.286275 1" mesh="right_ankle_visual"/>
                 <geom size="0.0328441 0.047044 0.02765" pos="-0.0177559 0.026944 -0.00166756" type="box" rgba="0.286275 0.286275 0.286275 0"/>
                 <body name="right_foot" pos="0 0 0" quat="0.707105 0.707108 0 0">
@@ -231,7 +231,7 @@
       </body>
       <body name="left_shoulder" pos="0 0.077 0.17725" quat="0.499998 -0.5 0.5 0.500002">
         <inertial pos="-3.61374e-05 -0.00254925 0.0287427" quat="0.618495 0.346197 0.615355 0.344891" mass="0.0845502" diaginertia="9.98768e-05 9.09162e-05 7.30289e-05"/>
-        <joint name="left_shoulder_pitch" pos="0 0.0106 0.1616" axis="0 0 1" limited="true" range="-3.14159 3.14159" class="MX64"/>
+        <joint name="left_shoulder_pitch" ref="-1.57" pos="0 0.0106 0.1616" axis="0 0 1" limited="true" range="-3.14159 3.14159" class="MX64"/>
         <geom type="mesh" contype="0" conaffinity="0" group="1" density="0" rgba="0.286275 0.286275 0.286275 1" mesh="left_shoulder_visual"/>
         <geom size="0.04 0.040721 0.0396866" pos="0 -0.000721047 0.0396866" type="box" rgba="0.286275 0.286275 0.286275 0"/>
         <body name="left_upper_arm" pos="0 -0.0100012 0.0479124" quat="0.499998 0.5 -0.500002 -0.5">
@@ -250,7 +250,7 @@
       </body>
       <body name="right_shoulder" pos="0 -0.077 0.17725" quat="0.499998 -0.5 0.5 0.500002">
         <inertial pos="-3.46247e-05 -0.00254925 -0.0287427" quat="0.346201 0.618498 0.344878 0.615357" mass="0.0845501" diaginertia="9.98771e-05 9.09162e-05 7.3029e-05"/>
-        <joint name="right_shoulder_pitch" pos="0 -0.0106 0.1616" axis="0 0 1" limited="true" range="-3.14159 3.14159" class="MX64"/>
+        <joint name="right_shoulder_pitch" ref="-1.57" pos="0 -0.0106 0.1616" axis="0 0 1" limited="true" range="-3.14159 3.14159" class="MX64"/>
         <geom type="mesh" contype="0" conaffinity="0" group="1" density="0" rgba="0.286275 0.286275 0.286275 1" mesh="right_shoulder_visual"/>
         <geom size="0.04 0.0407336 0.0396809" pos="0 -0.000733595 -0.0396809" type="box" rgba="0.286275 0.286275 0.286275 0"/>
         <body name="right_upper_arm" pos="0 -0.0100012 -0.0479124" quat="0.499998 0.5 -0.500002 -0.5">
@@ -284,6 +284,16 @@
       -9.04000e-01  1.20000e+00 -5.08000e-01  1.67000e-01 -2.22000e-08
         6.45000e-05  1.71000e+00  1.97000e-01 -7.13000e-01  1.71000e+00
       -1.97000e-01 -7.18000e-01
+      "
+    />
+
+    <key name="lying_face_down"
+      qpos="
+        0.00000e+00  0.00000e+00  0.15  0.70711  0.70711  0.00000e+00  0.00000e+00
+        0.00000e+00  0.00000e+00  0.00000e+00  0.00000e+00  0.00000e+00
+        0.00000e+00  0.00000e+00  0.00000e+00  0.00000e+00  0.00000e+00
+        0.00000e+00  0.00000e+00  0.00000e+00  0.00000e+00  0.00000e+00
+        0.00000e+00  0.00000e+00  0.00000e+00  0.00000e+00  0.00000e+00
       "
     />
   </keyframe>
