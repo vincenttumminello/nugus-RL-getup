@@ -24,7 +24,7 @@ class GetUpEnv(gym.Env):
             low=-np.inf, high=np.inf, shape=(n_obs,), dtype=np.float32
         )
         
-        self.max_steps = 1000
+        self.max_steps = 5000
         self.current_step = 0
 
         # Define which actuators to disable
@@ -156,15 +156,29 @@ class GetUpEnv(gym.Env):
         # Penalty for excessive control effort
         ctrl_cost = 0.1 * np.sum(np.square(self.data.ctrl))
         
+        torso_rot = self.data.xmat[torso_id]
+        print(f"Torso orientation matrix: {torso_rot}")
+
+        torso_quat = self.data.qpos[3:7]
+        print(f"Torso orientation (quat): {torso_quat}")
+        
         # Bonus for being upright (vertical orientation)
         upright_reward = 0.0
         if torso_height > 0.5  and torso_height < 1.0:  
             torso_rot = self.data.xmat[torso_id]
-            print(f"Torso orientation matrix: {torso_rot}")
-            # Check if torso is vertical (depends on your robot's orientation)
-            upright_reward = 10.0
-        if torso_height >=1.0:
+            # Check if torso is vertical (bottom row of rotation matrix close to [0, 0, 1])
+            if abs(torso_rot[2, 0]) < 1e-3 and abs(torso_rot[2, 1]) < 1e-3 and abs(torso_rot[2, 2] - 1) < 1e-3:
+                upright_reward = 1000.0
+            else:
+                upright_reward = 50.0 # Partial reward for being close in height range
+        elif torso_height >= 1.1:
             upright_reward = -200.0  # Penalize overshooting too high
+        elif torso_height > 0.1 and torso_height <= 0.3:
+            upright_reward = 10.0  # Small reward for being off the ground
+        elif torso_height > 0.3 and torso_height <= 0.5:
+            upright_reward = 20.0  # Larger reward for being mid-height
+        else:
+            upright_reward = -10.0  # Penalize being too low
 
         # Reward for having feet attached to ground (progressive)
         left_foot_force_id = mujoco.mj_name2id(self.model, mujoco.mjtObj.mjOBJ_SENSOR, 'left_foot_force')
@@ -211,7 +225,7 @@ class GetUpEnv(gym.Env):
             left_knee_pitch_vel, right_knee_pitch_vel
         ])
         # Penalise joints moving too fast ( > 2pi rad/s)
-        vel_penalty = 0.5 * np.sum(np.maximum(np.abs(limb_velocities) - 6.28, 0))
+        vel_penalty = 0.01 * np.sum(np.maximum(np.abs(limb_velocities) - 6.28, 0))
 
         
         return height_reward + upright_reward + foot_reward - ctrl_cost - vel_penalty
