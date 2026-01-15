@@ -5,3 +5,8 @@ pip install mujoco gymnasium numpy torch stable-baselines3 tensorboard
 To view the xml file, run inside activated environment:
 python -m mujoco.viewer --mjcf=nugus/nugus.xml 
 
+
+# Visualise the logs
+tensorboard --logdir=./logs/PPOXX
+
+
