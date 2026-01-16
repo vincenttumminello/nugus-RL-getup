@@ -156,12 +156,6 @@ class GetUpEnv(gym.Env):
         # Penalty for excessive control effort
         ctrl_cost = 0.1 * np.sum(np.square(self.data.ctrl))
         
-        torso_rot = self.data.xmat[torso_id]
-        print(f"Torso orientation matrix: {torso_rot}")
-
-        torso_quat = self.data.qpos[3:7]
-        print(f"Torso orientation (quat): {torso_quat}")
-        
         # Bonus for being upright (vertical orientation)
         upright_reward = 0.0
         if torso_height > 0.5  and torso_height < 1.0:  
