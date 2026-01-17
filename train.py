@@ -1,9 +1,11 @@
 from stable_baselines3 import SAC
 from stable_baselines3.common.env_checker import check_env
 from stable_baselines3.common.callbacks import BaseCallback
+from stable_baselines3.common.vec_env import DummyVecEnv, VecNormalize
 from torch.utils.tensorboard import SummaryWriter
 from environment import GetUpEnv
 import mujoco 
+import numpy as np
 
 class DataLoggingCallback(BaseCallback):
     """Log extra data every step to the SB3 logger (visible in TensorBoard)."""
@@ -35,6 +37,9 @@ class DataLoggingCallback(BaseCallback):
             # Read torso height from env's mujoco data
             torso_id = mujoco.mj_name2id(env0.model, mujoco.mjtObj.mjOBJ_BODY, "torso")
             torso_height = float(env0.data.xpos[torso_id][2])
+            torso_rot = env0.data.xmat[torso_id]
+            torso_pitch = np.arctan2(torso_rot[6], np.sqrt(torso_rot[7]**2 + torso_rot[8]**2))  # rotation around y-axis
+            torso_roll = np.arctan2(torso_rot[7], torso_rot[8])  # rotation around x-axis
 
             # Read left foot height
             left_foot_id = mujoco.mj_name2id(env0.model, mujoco.mjtObj.mjOBJ_BODY, "left_foot")
@@ -51,10 +56,8 @@ class DataLoggingCallback(BaseCallback):
             self.writer.add_scalar("custom/left_shoulder_pitch_control", left_shoulder_pitch_control, self.num_timesteps)
             self.writer.add_scalar("custom/right_shoulder_pitch_control", right_shoulder_pitch_control, self.num_timesteps)
             self.writer.add_scalar("custom/left_foot_height", left_foot_height, self.num_timesteps)
-            # self.logger.record("custom/torso_height", torso_height)
-            # self.logger.record("custom/left_shoulder_pitch_control", left_shoulder_pitch_control)
-            # self.logger.record("custom/right_shoulder_pitch_control", right_shoulder_pitch_control)
-            # self.logger.record("custom/left_foot_height", left_foot_height)
+            self.writer.add_scalar("custom/torso_pitch", torso_pitch, self.num_timesteps)
+            self.writer.add_scalar("custom/torso_roll", torso_roll, self.num_timesteps)
         except Exception as e:
             if self.verbose:
                 print("DataLoggingCallback error:", e)
@@ -68,7 +71,7 @@ class DataLoggingCallback(BaseCallback):
             pass
 
 # Create environment
-env = GetUpEnv("nugus/scene.xml")
+env = GetUpEnv("nugus/scene.xml", max_steps=2000)
 
 # Verify environment is correct
 check_env(env)
@@ -87,7 +90,8 @@ model = SAC(
     tau=0.005,
     ent_coef="auto",
     gamma=0.99,
-    tensorboard_log="./logs/"
+    tensorboard_log="./logs/",
+    device="cuda"
 )
 
 # Train the agent

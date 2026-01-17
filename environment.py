@@ -4,7 +4,7 @@ import numpy as np
 import mujoco
 
 class GetUpEnv(gym.Env):
-    def __init__(self, xml_path):
+    def __init__(self, xml_path, max_steps=1000):
         super().__init__()
         
         # Load your robot model
@@ -24,7 +24,7 @@ class GetUpEnv(gym.Env):
             low=-np.inf, high=np.inf, shape=(n_obs,), dtype=np.float32
         )
         
-        self.max_steps = 5000
+        self.max_steps = max_steps
         self.current_step = 0
 
         # Define which actuators to disable
@@ -45,7 +45,7 @@ class GetUpEnv(gym.Env):
         )
 
         # Slew-rate constraint
-        self.slew_rate = 25.0
+        self.slew_rate = 15.0
         self.prev_action = np.zeros(self.model.nu, dtype=np.float64)
 
 
@@ -171,81 +171,31 @@ class GetUpEnv(gym.Env):
     def _calculate_reward(self):
         # Reward based on torso height and uprightness
         torso_id = mujoco.mj_name2id(self.model, mujoco.mjtObj.mjOBJ_BODY, 'torso')
-        torso_height = self.data.xpos[torso_id][2]  # z-coordinate
+
+        # Stage based rewards for uprightness of torso (not considering height or feet contacts yet)
+        torso_rot = self.data.xmat[torso_id]
+        torso_roll = np.arctan2(torso_rot[7], torso_rot[8])  # rotation around x-axis
+        torso_pitch = np.arctan2(torso_rot[6], np.sqrt(torso_rot[7]**2 + torso_rot[8]**2))  # rotation around y-axis
 
         # Reward for being upright
-        height_reward = torso_height
-        
-        # Penalty for excessive control effort
-        ctrl_cost = 0.1 * np.sum(np.square(self.data.ctrl))
-        
-        # Bonus for being upright (vertical orientation)
         upright_reward = 0.0
-        if torso_height > 0.5  and torso_height < 1.0:  
-            torso_rot = self.data.xmat[torso_id]
-            # Check if torso is vertical (bottom row of rotation matrix close to [0, 0, 1])
-            if abs(torso_rot[6]) < 1e-3 and abs(torso_rot[7]) < 1e-3 and abs(torso_rot[8] - 1) < 1e-3:
-                upright_reward = 1000.0
-            else:
-                upright_reward = 50.0 # Partial reward for being close in height range
-        elif torso_height >= 1.1:
-            upright_reward = -200.0  # Penalize overshooting too high
-        elif torso_height > 0.1 and torso_height <= 0.3:
-            upright_reward = 10.0  # Small reward for being off the ground
-        elif torso_height > 0.3 and torso_height <= 0.5:
-            upright_reward = 20.0  # Larger reward for being mid-height
+        if abs(torso_roll) < 0.1 and abs(torso_pitch) < 0.1:
+            upright_reward = 100.0  # Full reward for being upright
+        elif abs(torso_roll) < 0.1 or abs(torso_pitch) < 0.1:
+            upright_reward = 7.0  # Points for being upright in one axis
+        elif abs(torso_roll) < 0.2 and abs(torso_pitch) < 0.2:
+            upright_reward = 50.0  # Partial reward for being close to upright
+        elif abs(torso_roll) < 0.2 or abs(torso_pitch) < 0.2:
+            upright_reward = 3.0   # Less points for being less upright in one axis
+        elif abs(torso_roll) < 0.4 and abs(torso_pitch) < 0.4:
+            upright_reward = 10.0  # Small reward for being somewhat upright
+        elif abs(torso_roll) < 0.6 and abs(torso_pitch) < 0.6:
+            upright_reward = 5.0  # Very small reward for being tilted
         else:
-            upright_reward = -10.0  # Penalize being too low
-
-        # Reward for having feet attached to ground (progressive)
-        left_foot_force_id = mujoco.mj_name2id(self.model, mujoco.mjtObj.mjOBJ_SENSOR, 'left_foot_force')
-        right_foot_force_id = mujoco.mj_name2id(self.model, mujoco.mjtObj.mjOBJ_SENSOR, 'right_foot_force')
-    
-        left_foot_force = np.linalg.norm(self.data.sensordata[left_foot_force_id:left_foot_force_id+3])
-        right_foot_force = np.linalg.norm(self.data.sensordata[right_foot_force_id:right_foot_force_id+3])
-
-        # Stage-based reward
-        # Early stage: Reward getting feet under body and in contact
-        # Late stage: Reward standing with weight on both feet
-        
-        if torso_height < 0.3:
-            # Early: Just reward any foot contact
-            foot_reward = 0.1 * (min(left_foot_force / 10.0, 1.0) + min(right_foot_force / 10.0, 1.0))
-        elif torso_height < 0.6:
-            # Mid: Reward balanced foot contact
-            foot_reward = 1 * min(left_foot_force, right_foot_force) / 20.0
-        else:
-            # Standing: Reward strong, balanced support
-            total_force = left_foot_force + right_foot_force
-            balance = 1.0 - abs(left_foot_force - right_foot_force) / (total_force + 1e-6)
-            foot_reward = 1.0 * (total_force / 50.0) * balance * 2
-
-        ## Penalise high limb velocities 
-        # Get joint velocities
-        left_hip_pitch_vel = self.data.qvel[self.left_hip_pitch_vel_adr]
-        right_hip_pitch_vel = self.data.qvel[self.right_hip_pitch_vel_adr]
-        left_hip_roll_vel = self.data.qvel[self.left_hip_roll_vel_adr]
-        right_hip_roll_vel = self.data.qvel[self.right_hip_roll_vel_adr]
-        left_shoulder_pitch_vel = self.data.qvel[self.left_shoulder_pitch_vel_adr]
-        right_shoulder_pitch_vel = self.data.qvel[self.right_shoulder_pitch_vel_adr]
-        left_shoulder_roll_vel = self.data.qvel[self.left_shoulder_roll_vel_adr]
-        right_shoulder_roll_vel = self.data.qvel[self.right_shoulder_roll_vel_adr]
-        left_elbow_pitch_vel = self.data.qvel[self.left_elbow_pitch_vel_adr]
-        right_elbow_pitch_vel = self.data.qvel[self.right_elbow_pitch_vel_adr]
-        left_knee_pitch_vel = self.data.qvel[self.left_knee_pitch_vel_adr]
-        right_knee_pitch_vel = self.data.qvel[self.right_knee_pitch_vel_adr]
-        limb_velocities = np.array([
-            left_hip_pitch_vel, right_hip_pitch_vel,
-            left_hip_roll_vel, right_hip_roll_vel,
-            left_shoulder_pitch_vel, right_shoulder_pitch_vel,
-            left_shoulder_roll_vel, right_shoulder_roll_vel,
-            left_knee_pitch_vel, right_knee_pitch_vel
-        ])
-        # Penalise joints moving too fast ( > 2pi rad/s)
-        vel_penalty = 0.01 * np.sum(np.maximum(np.abs(limb_velocities) - 6.28, 0))
+            upright_reward = -1.0  # Penalty for being far from upright
 
         
-        return height_reward + upright_reward + foot_reward - ctrl_cost - vel_penalty
+        return upright_reward
     
     def _is_standing(self):
         # Define success: torso is above certain height and stable
