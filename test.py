@@ -1,8 +1,8 @@
 from environment import GetUpEnv
-from stable_baselines3 import PPO
+from stable_baselines3 import SAC
 
 # Load trained model
-model = PPO.load("getup_robot")
+model = SAC.load("getup_robot")
 
 # Test with visualization
 env = GetUpEnv("nugus/scene.xml")

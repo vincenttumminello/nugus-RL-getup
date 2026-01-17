@@ -1,4 +1,4 @@
-from stable_baselines3 import PPO
+from stable_baselines3 import SAC
 from stable_baselines3.common.env_checker import check_env
 from stable_baselines3.common.callbacks import BaseCallback
 from torch.utils.tensorboard import SummaryWriter
@@ -73,23 +73,25 @@ env = GetUpEnv("nugus/scene.xml")
 # Verify environment is correct
 check_env(env)
 
-# Create RL agent (PPO is good for continuous control)
-model = PPO(
+# Create RL agent (SAC is good for continuous control)
+model = SAC(
     "MlpPolicy",
     env,
     verbose=1,
-    learning_rate=3e-4,
-    n_steps=2048,
-    batch_size=64,
-    n_epochs=10,
+    learning_rate=10e-3,
+    buffer_size=100_000,
+    batch_size=256,
+    learning_starts=1_000,
+    train_freq=1,
+    gradient_steps=1,
+    tau=0.005,
+    ent_coef="auto",
     gamma=0.99,
-    gae_lambda=0.95,
-    clip_range=0.2,
     tensorboard_log="./logs/"
 )
 
 # Train the agent
-model.learn(total_timesteps=1_000_000)
+model.learn(total_timesteps=100_000, callback=DataLoggingCallback(verbose=1))
 
 # Save the trained model
 model.save("getup_robot")

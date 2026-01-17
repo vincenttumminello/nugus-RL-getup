@@ -84,7 +84,7 @@ class GetUpEnv(gym.Env):
         # Set lying face down position
         self.data.qpos[0] = 0.0  # x position
         self.data.qpos[1] = 0.0  # y position
-        self.data.qpos[2] = -0.15  # z position (slightly above ground)
+        self.data.qpos[2] = 0.5  # z position (slightly above ground)
         
         # Set orientation face down (90° pitch forward)
         self.data.qpos[3] = 0.7071  # qw
@@ -161,7 +161,7 @@ class GetUpEnv(gym.Env):
         if torso_height > 0.5  and torso_height < 1.0:  
             torso_rot = self.data.xmat[torso_id]
             # Check if torso is vertical (bottom row of rotation matrix close to [0, 0, 1])
-            if abs(torso_rot[2, 0]) < 1e-3 and abs(torso_rot[2, 1]) < 1e-3 and abs(torso_rot[2, 2] - 1) < 1e-3:
+            if abs(torso_rot[6]) < 1e-3 and abs(torso_rot[7]) < 1e-3 and abs(torso_rot[8] - 1) < 1e-3:
                 upright_reward = 1000.0
             else:
                 upright_reward = 50.0 # Partial reward for being close in height range
