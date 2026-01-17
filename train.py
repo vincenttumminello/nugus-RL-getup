@@ -7,7 +7,7 @@ import mujoco
 
 class DataLoggingCallback(BaseCallback):
     """Log extra data every step to the SB3 logger (visible in TensorBoard)."""
-    def __init__(self, log_dir="./logs/CustomData/", verbose=0):
+    def __init__(self, log_dir="./logs/", verbose=0):
         super().__init__(verbose)
         self.writer = SummaryWriter(log_dir)
 

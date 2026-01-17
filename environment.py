@@ -44,6 +44,11 @@ class GetUpEnv(gym.Env):
             low=-1, high=1, shape=(n_actions,), dtype=np.float32
         )
 
+        # Slew-rate constraint
+        self.slew_rate = 25.0
+        self.prev_action = np.zeros(self.model.nu, dtype=np.float64)
+
+
         # Needed joint addresses
         left_shoulder_pitch_id = mujoco.mj_name2id(self.model, mujoco.mjtObj.mjOBJ_JOINT, 'left_shoulder_pitch')
         self.left_shoulder_pitch_vel_adr = self.model.jnt_dofadr[left_shoulder_pitch_id]
@@ -77,6 +82,8 @@ class GetUpEnv(gym.Env):
         
     def reset(self, seed=None, options=None):
         super().reset(seed=seed)
+
+        self.prev_action[:] = 0.0
         
         # Reset to initial lying down pose
         mujoco.mj_resetData(self.model, self.data)
@@ -120,14 +127,30 @@ class GetUpEnv(gym.Env):
     
     def step(self, action):
         # Map reduced action to full control vector
-        full_ctrl = np.zeros(self.model.nu)
-        # Null action on all actuators until 150 timesteps
-        if self.current_step > 150:
-            full_ctrl[self.enabled_mask] = action
+        desired_full = np.zeros(self.model.nu)
+        # Null action on all actuators until 165 timesteps
+        if self.current_step > 165:
+            desired_full[self.enabled_mask] = action
 
-        # Apply action (scale to appropriate range)
-        self.data.ctrl[:] = full_ctrl * self.model.actuator_ctrlrange[:, 1]
-        
+        # Scale into actuator control range
+        desired_full = desired_full * self.model.actuator_ctrlrange[:, 1]
+        # Apply slew-rate constraint
+        dt = getattr(self.model, "opt", None)
+        dt = self.model.opt.timestep if dt is not None else 0.002
+
+        # Per actuator max delta this step
+        if np.isscalar(self.slew_rate):
+            max_delta = float(self.slew_rate) * dt
+            delta = np.clip(desired_full - self.prev_action, -max_delta, max_delta)
+        else:
+            max_delta = self.slew_rate * dt
+            delta = np.clip(desired_full - self.prev_action, -max_delta, max_delta)
+
+        applied_ctrl = self.prev_action + delta
+        self.data.ctrl[:] = applied_ctrl
+        # Store for next step
+        self.prev_action[:] = applied_ctrl
+
         # Step the simulation
         mujoco.mj_step(self.model, self.data)
         
